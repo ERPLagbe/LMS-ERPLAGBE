@@ -1,0 +1,23 @@
+@import './assets/Inter/inter.css';
+@import 'frappe-ui/src/style.css';
+
+.plyr__video-wrapper.plyr__video-embed {
+	aspect-ratio: 16 / 9;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.plyr__video-wrapper.plyr__video-embed iframe {
+	width: 300%;
+	height: 100%;
+	margin-left: -100%;
+}
+
+.youtube-video-embed iframe {
+	pointer-events: none;
+}
+
+.sidebar {
+	z-index: 100;
+}

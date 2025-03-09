@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Welcome</title>
+		<link rel="icon" href="assets/lms_api/images/favico.png" type="image/x-icon" />
+		<style>
+			body {
+				margin: 0;
+				font-family: Arial, sans-serif;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100%;
+				flex-direction: column;
+			}
+
+			.navbar {
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 10px;
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 1000;
+				box-shadow: 0 0 5px gray;
+				background-color: #fff;
+			}
+			.navbar img {
+				width: 100px;
+				height: 40px;
+			}
+
+			.container {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				height: 100%;
+				padding-top: 70px; /* Adjusted for navbar */
+			}
+
+			.content {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 20px;
+				font-weight: bold;
+				padding: 60px 30px;
+			}
+
+			#mobile-login-form {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.text-section {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.text-section h1 {
+				font-size: 24px;
+				color: #004341;
+			}
+
+			.text-section p {
+				font-size: 14px;
+				font-weight: 500;
+				width: 100%;
+			}
+
+			.text-section input {
+				width: 290px;
+				padding: 10px;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+				margin: 15px 0;
+			}
+
+			.text-section button {
+				width: 310px;
+				background-color: #004341;
+				color: #fff;
+				padding: 10px;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 14px;
+			}
+
+			.text-section button:hover {
+				background-color: #002e2c;
+			}
+
+			.image-section {
+				display: none;
+			}
+
+			.image-section img {
+				width: 100%;
+				height: calc(100vh - 80px);
+				object-fit: contain;
+			}
+
+			@media (min-width: 768px) {
+				.image-section {
+					display: block;
+				}
+				.content {
+					padding: 0;
+				}
+				.text-section p {
+					width: 66%;
+				}
+			}
+		</style>
+		<!-- Google Tag Manager -->
+		<script>
+			(function (w, d, s, l, i) {
+				w[l] = w[l] || [];
+				w[l].push({
+					"gtm.start": new Date().getTime(),
+					event: "gtm.js",
+				});
+				var f = d.getElementsByTagName(s)[0],
+					j = d.createElement(s),
+					dl = l != "dataLayer" ? "&l=" + l : "";
+				j.async = true;
+				j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+				f.parentNode.insertBefore(j, f);
+			})(window, document, "script", "dataLayer", "GTM-MGRQP6FN");
+		</script>
+		<!-- End Google Tag Manager -->
+	</head>
+	<body>
+		<div class="navbar">
+			<img src="/assets/lms_api/images/logo.png" />
+		</div>
+		<div class="container">
+			<div class="content">
+				<div class="text-section">
+					<h1>স্বাগতম 👋</h1>
+					<p>
+						জোবায়ের একাডেমীতে লগইন করতে, আপনার মোবাইল নম্বর অথবা ইমেইল ঠিকানা ব্যবহার
+						করে এগিয়ে যান।
+					</p>
+					<form id="mobile-login-form">
+						<input
+							type="text"
+							id="identifier"
+							placeholder="মোবাইল নাম্বার/ইমেইল"
+							required
+						/>
+						<button type="submit">এগিয়ে যান</button>
+					</form>
+				</div>
+			</div>
+			<div class="image-section">
+				<img src="/assets/lms_api/images/login-img.png" alt="Welcome Image" />
+			</div>
+		</div>
+
+		<script>
+			document
+				.getElementById("mobile-login-form")
+				.addEventListener("submit", function (event) {
+					event.preventDefault();
+
+					const identifier = document.getElementById("identifier").value.trim();
+
+					// Check if identifier is empty
+					if (!identifier) {
+						alert("মোবাইল নাম্বার / ইমেইল লিখুন");
+						return;
+					}
+
+					// Determine if the identifier is a mobile number or email
+					const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier); // Simple email regex
+					const isMobile = /^\d{10,15}$/.test(identifier); // Mobile regex for 10-15 digits
+
+					if (!isEmail && !isMobile) {
+						alert("সঠিক মোবাইল নাম্বার বা ইমেইল প্রদান করুন");
+						return;
+					}
+
+					// Make the API call
+					fetch(
+						"/api/method/lms_api.api.create_user_with_mobile_or_email_and_generate_link",
+						{
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({ identifier: identifier }),
+						}
+					)
+						.then((response) => response.json())
+						.then(async (data) => {
+							if (data.status === "error") {
+								alert(data.message); // Display the error message from the backend
+							} else if (data.message) {
+								const type = isMobile ? "mobile" : "email"; // Set type dynamically
+
+								// Redirect based on the response and identifier type
+								if (data.message.password) {
+									window.location.href = `/verification?type=password&identifier=${identifier}`;
+								} else {
+									window.location.href = `/verification?type=otp&identifier=${identifier}`;
+								}
+							} else {
+								alert("ত্রুটি ঘটেছে, আবার চেষ্টা করুন");
+							}
+						})
+						.catch((error) => {
+							alert("সার্ভারে একটি ত্রুটি ঘটেছে");
+						});
+				});
+		</script>
+	</body>
+</html>

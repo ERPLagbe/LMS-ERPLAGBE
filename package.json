@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@editorjs/marker": "^1.4.0",
+    "@editorjs/underline": "^1.2.1"
+  }
+}
